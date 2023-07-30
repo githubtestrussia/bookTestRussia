@@ -6,6 +6,7 @@ import LibraryPagination from "../LibraryPagination/LibraryPagination.jsx";
 import {useDispatch, useSelector} from "react-redux";
 import {addBooks, changeLoadingStatus} from "../../reducers/libraryReducer.js";
 import SearchInput from "../SearchInput/SearchInput.jsx";
+import {fetchBooks} from "../../bookThunks.js";
 
 
 const BookList = () => {
@@ -18,23 +19,14 @@ const BookList = () => {
     const currentBooks = books ? books.slice((currentBooksPage - 1) * pageSize, currentBooksPage * pageSize) : [];
 
 
-        const getBooks = async () => {
-            try {
-                await axios(`https://www.googleapis.com/books/v1/volumes?q=${inputTitle}&maxResults=40`)
-                    .then(book=>dispatch(addBooks(book.data.items)));
 
-            } catch (error) {
-                alert(error);
-            }
-            dispatch(changeLoadingStatus(false))
-        };
 
 const changeBookListPage =(e)=>{
     setCurrentBooksPage(e)
 }
 
     useEffect(() => {
-            getBooks();
+        dispatch(fetchBooks(inputTitle));
     }, [inputTitle]);
 
 

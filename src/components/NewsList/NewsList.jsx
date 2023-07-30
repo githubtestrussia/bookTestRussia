@@ -1,11 +1,10 @@
-import axios from "axios";
-import libraryReducer, { addNews, changeLoadingStatus} from "../../reducers/libraryReducer.js";
+
 import React, {useEffect, useState} from "react";
-import {API_KEY} from "./newsList.js";
 import {useDispatch, useSelector} from "react-redux";
 import NewsItem from "../NewsItem/NewsItem.jsx";
 import LibraryPagination from "../LibraryPagination/LibraryPagination.jsx";
 import Loader from "../Loader/Loader.jsx";
+import {fetchNews} from "../../newsThunks.js";
 
 const NewsList =()=>{
     const {isLoading, newsList} = useSelector(state=>state.libraryReducer);
@@ -16,24 +15,14 @@ const NewsList =()=>{
     const pageSize = 10;
 
     const currentNews = newsList.slice((newsCurrentPage - 1) * pageSize, newsCurrentPage * pageSize);
-    const getNews = async () => {
-        dispatch(changeLoadingStatus(true))
-        try {
-            await axios(`https://newsapi.org/v2/everything?q=apple&from=2023-07-29&to=2023-07-29&sortBy=popularity&apiKey=${API_KEY}`)
-                .then(news=>dispatch(addNews(news.data?.articles)));
 
-        } catch (error) {
-            alert(error);
-        }
-        dispatch(changeLoadingStatus(false))
-    };
 
     const changeNewListPage =(e)=>{
         setNewsCurrentPage(e)
     }
 
     useEffect(() => {
-        getNews();
+        dispatch(fetchNews());
     }, []);
 
 
