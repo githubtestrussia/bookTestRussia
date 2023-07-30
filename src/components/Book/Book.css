@@ -21,6 +21,15 @@
 }
 
 
+.detailsBookImage{
+    width: 20%;
+    border:1px solid green;
+}
+.detailsNoBookImage{
+    width: 25%;
+}
+
+
 .book-image {
     width: 60%;
     height: 229px;
