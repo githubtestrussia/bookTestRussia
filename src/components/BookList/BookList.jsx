@@ -2,20 +2,26 @@ import React, {useEffect, useState} from 'react';
 import Book from '../Book/Book.jsx';
 import axios from "axios";
 import Loader from "../Loader/Loader.jsx";
-import BookPagination from "../BookPagination/BookPagination.jsx";
+import LibraryPagination from "../LibraryPagination/LibraryPagination.jsx";
 import {useDispatch, useSelector} from "react-redux";
-import {changeLoadingStatus} from "../../reducers/bookReducer.js";
+import {addBooks, changeLoadingStatus} from "../../reducers/libraryReducer.js";
+import SearchInput from "../SearchInput/SearchInput.jsx";
+
 
 const BookList = () => {
-    const [books, setBooks] = useState([]);
-
-    const isLoadingBooks = useSelector(state=>state.bookReducer.isLoadingBooks);
+    const { isLoading, books, inputTitle } = useSelector(state=>state.libraryReducer);
     const dispatch = useDispatch();
+
+    const [currentBooksPage, setCurrentBooksPage] = useState(1);
+    const pageSize = 9;
+
+    const currentBooks = books ? books.slice((currentBooksPage - 1) * pageSize, currentBooksPage * pageSize) : [];
+
 
         const getBooks = async () => {
             try {
-                await axios('https://www.googleapis.com/books/v1/volumes?q=pokemons&maxResults=40')
-                    .then(book=>setBooks(book.data.items));
+                await axios(`https://www.googleapis.com/books/v1/volumes?q=${inputTitle}&maxResults=40`)
+                    .then(book=>dispatch(addBooks(book.data.items)));
 
             } catch (error) {
                 alert(error);
@@ -23,26 +29,40 @@ const BookList = () => {
             dispatch(changeLoadingStatus(false))
         };
 
+const changeBookListPage =(e)=>{
+    setCurrentBooksPage(e)
+}
 
     useEffect(() => {
-        getBooks()
-    }, []);
+            getBooks();
+    }, [inputTitle]);
 
 
 
     return (
-        <div style={{maxWidth: '100vw', display:'flex',flexWrap:'wrap', overflowY:'hidden', justifyContent:'center'}}>
-            {isLoadingBooks ?  <Loader margin='80px 0' textAlign='center' borderRadius='4px' size='large'/> :''}
-                {books&& books.map((book) => (
-                    <Book
-                        key={crypto.randomUUID()}
-                        title={book?.volumeInfo?.title}
-                        author={book?.volumeInfo?.authors?.join(', ')}
-                        thumbnail={book?.volumeInfo?.imageLinks?.thumbnail}
-                    />
-                ))}
-           < BookPagination/>
-    </div>
+        <div>
+            <SearchInput />
+            {isLoading ? (
+                <Loader margin="50px 0" borderRadius="4px" size="large" width="100%" />
+            ) : (
+                <>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        {currentBooks.length ?
+                            currentBooks.map((book) => (
+                                <Book
+                                    key={crypto.randomUUID()}
+                                    id={crypto.randomUUID()}
+                                    title={book?.volumeInfo?.title}
+                                    author={book?.volumeInfo?.authors?.join(', ')}
+                                    thumbnail={book?.volumeInfo?.imageLinks?.thumbnail}
+                                    description={book?.volumeInfo?.description}
+                                />
+                            )):''}
+                    </div>
+                    <LibraryPagination top={50} bottom={50} total={Math.ceil(books.length / pageSize) * 10} onChangePage={changeBookListPage} />
+                </>
+            )}
+        </div>
     );
 };
 export default BookList;
