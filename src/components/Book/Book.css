@@ -1,0 +1,33 @@
+.book-tile {
+    width: 20vw;
+    height: 400px;
+    padding: 25px;
+    margin: 25px 20px;
+    border: 1px solid #bfe3fc;
+    text-align: center;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.book-tile:hover {
+    transform: scale(1.03);
+    border: 1px solid #629eff;
+}
+
+.nobook-image {
+    width: 80%;
+    max-width: 100%;
+
+}
+
+
+.book-image {
+    width: 60%;
+    height: 229px;
+    margin-bottom: 4%;
+}
+
+.title{
+    height:50px;
+
+}
